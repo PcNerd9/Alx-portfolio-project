@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aylon</title>
+    <link rel="stylesheet" href="static/hompage.css">
+</head>
+
+<body>
+    <h1>Aylon</h1>
+    <form class="upload-form" id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" id="file">
+        <label for="file">Select Image</label>
+        <div class="file-name" id="file-name"></div>
+        <img id="preview" class="preview" src="" alt="Image preview">
+        <input type="submit" value="Upload">
+    </form>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Extracting table from image...</p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="./static/script.js"></script>
+</body>
+
+</html>

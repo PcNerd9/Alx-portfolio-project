@@ -4,11 +4,12 @@ from paddleocr import PaddleOCR, draw_ocr
 import tensorflow as tf
 import numpy as np
 import pandas as pd
+import os
 
 
 
 # EXTRACT TABLE FROM THE IMAGE
-def extractTable(file_path):
+def extractTable(file_path, output_path):
 
     image = cv2.imread(file_path)
     if image is None:
@@ -23,23 +24,27 @@ def extractTable(file_path):
                                 enable_mkldnn=True)
     
     # detect Table
+    table_is_present = False
 
     layout = model.detect(image)
+
     for l in layout:
         if l.type == "Table":
             table = l
+            table_is_present = True
             break
-
+    
+    if table_is_present == False:
+        return None
     table_block = table.block
     x_1 = int(table_block.x_1)
     y_1 = int(table_block.y_1)
     x_2 = int(table_block.x_2)
     y_2 = int(table_block.y_2)
 
-    extracted_table_file_path = "extracted_table/countries.jpg"
 
-    cv2.imwrite(extracted_table_file_path, image[y_1:y_2, x_1:x_2])
-    return extracted_table_file_path
+    cv2.imwrite(output_path, image[y_1:y_2, x_1:x_2])
+    return output_path
 
 
 
@@ -147,24 +152,27 @@ class ImageToCsv:
 image_path = "dataset/data-in-spreadsheet.png"
 
 print("Extracting table....")
-extract_table = extractTable(image_path)
+
 print("Successfully Extract table")
 
-
-image_to_csv = ImageToCsv(extract_table)
-if image_to_csv is None:
-    print("Unable to extract table")
-    exit()
-print("reading table....")
-image_to_csv.read_image()
-print("loading table data....")
-image_to_csv.load_image_data()
-print("getting all the rows and column in the table...")
-image_to_csv.get_rows_and_column_of_table()
-print("extracting the text in the table...")
-image_to_csv.formatText2RowsAndColumn()
-output_path = "generated_csv/text_model.csv"
-print("saving the csv to a file")
-image_to_csv.save_to_csv(output_path)
-print("Done successfully extracting table")
+def converter_image_to_csv(file_path, filename):
+    
+    extract_table = extractTable(file_path, file_path)
+    if extract_table is None:
+        return None
+    image_to_csv = ImageToCsv(extract_table)
+  
+    # print("reading table....")
+    image_to_csv.read_image()
+    # print("loading table data....")
+    image_to_csv.load_image_data()
+    # print("getting all the rows and column in the table...")
+    image_to_csv.get_rows_and_column_of_table()
+    # print("extracting the text in the table...")
+    image_to_csv.formatText2RowsAndColumn()
+    output_path = f"generated_csv/{filename}"
+    # print("saving the csv to a file")
+    image_to_csv.save_to_csv(output_path)
+    return 1
+    # print("Done successfully extracting table")
 
